@@ -24,6 +24,8 @@
     </config-file>
 
     <source-file src="src/android/Blowfish.java" target-dir="src/com/apreta/plugin/"/>
+    <source-file src="src/android/BlowfishECB.java" target-dir="src/com/apreta/plugin/"/>
+    <source-file src="src/android/BinConverter.java" target-dir="src/com/apreta/plugin/"/>
   </platform>
 
   <platform name="ios">

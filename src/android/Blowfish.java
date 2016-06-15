@@ -3,13 +3,9 @@ package com.apreta.plugin;
 import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
-import java.util.zip.Inflater;
-import java.util.zip.Deflater;
-import java.util.zip.DataFormatException;
-import java.util.ArrayList;
 
 public class Blowfish extends CordovaPlugin {
-
+    private BlowfishECB coder = null;
 
     public Blowfish() {
     }
@@ -27,12 +23,8 @@ public class Blowfish extends CordovaPlugin {
             }
             case "decrypt": {
                 JSONArray jsData = data.getJSONArray(0);
-                try {
-                    JSONArray out = this.decrypt(jsData);
-                    callbackContext.success(out);
-                } catch (DataFormatException ex) {
-                    callbackContext.error("Decryption error");
-                }
+                JSONArray out = this.decrypt(jsData);
+                callbackContext.success(out);
                 return true;
             }
             case "setKey": {
@@ -55,6 +47,8 @@ public class Blowfish extends CordovaPlugin {
 
         byte[] encryptedBytes = new byte[originalBytes.length];
 
+        coder.encrypt(originalBytes, 0, encryptedBytes, 0, in.length());
+
         JSONArray out = new JSONArray();
         for (int i=0; i<encryptedBytes.length; i++) {
             byte data = encryptedBytes[i];
@@ -64,19 +58,21 @@ public class Blowfish extends CordovaPlugin {
         return out;
     }
 
-    public JSONArray decrypt(JSONArray in) throws DataFormatException, JSONException {
+    public JSONArray decrypt(JSONArray in) throws JSONException {
 
-        byte[] compressedBytes = new byte[in.length()];
+        byte[] encryptedBytes = new byte[in.length()];
         for (int i=0; i<in.length(); i++) {
             int data = in.optInt(i); 
-            compressedBytes[i] = (byte)(data > 127 ? data - 256 : data);
+            encryptedBytes[i] = (byte)(data > 127 ? data - 256 : data);
         }
 
-        byte[] decompressedBytes = new byte[compressedBytes.length];
+        byte[] originalBytes = new byte[encryptedBytes.length];
+
+        coder.decrypt(encryptedBytes, 0, originalBytes, 0, in.length());
 
         JSONArray out = new JSONArray();
-        for (int i=0; i<decompressedBytes.length; i++) {
-            byte data = decompressedBytes[i];
+        for (int i=0; i<originalBytes.length; i++) {
+            byte data = originalBytes[i];
             out.put((int)(data < 0 ? 256 + data : data));
         }
 
@@ -84,5 +80,11 @@ public class Blowfish extends CordovaPlugin {
     }
 
     public void setKey(JSONArray in) {
+        byte[] keyBytes = new byte[in.length()];
+        for (int i=0; i<in.length(); i++) {
+            int data = in.optInt(i); 
+            keyBytes[i] = (byte)(data > 127 ? data - 256 : data);
+        }
+        coder = new BlowfishECB(keyBytes, 0, keyBytes.length);
     }
 }
