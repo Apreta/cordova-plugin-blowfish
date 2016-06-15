@@ -9,9 +9,9 @@
     <engine name="cordova" version=">=3.4.0"/>
   </engines>
 
-  <asset src="www/blowfish.js" target="js/blowfish.js"/>
+  <asset src="www/blowfish-plugin.js" target="js/blowfish-plugin.js"/>
 
-  <js-module src="www/blowfish.js" name="blowfish">
+  <js-module src="www/blowfish-plugin.js" name="blowfish-plugin">
     <clobbers target="blowfish" />
   </js-module>
 
