@@ -1,6 +1,7 @@
 # Cordova Zlib Plugin
 
-Plugin providing Blowfish decryption.
+Plugin providing Blowfish decryption.  This plugin is intended to interoperate with the encryption used by
+other Apreta Conferencing clients and may not match the endianiness of other Blowfish implementations.
 
 ## Using
 
